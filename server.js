@@ -1,7 +1,7 @@
 const app = require('./app')
 
 const dotenv = require('dotenv')
-// const connectDataBase = require("./config/dataBase.js")
+const connectDataBase = require("./config/dataBase.js")
 
 //Handling uncaught exception
 process.on("uncaughtException", (err) => {

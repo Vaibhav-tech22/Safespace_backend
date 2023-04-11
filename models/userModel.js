@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -19,13 +20,18 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxLength: [11, 'Your phone number cannot exceed 11 characters']
     },
-    password: {
-        type: String,
-        required: [true, 'Please enter your password'],
-        trim: true,
-        minLength: [6, 'Your password must be longer than 6 characters']
-    }
-
+    verified: {
+        type: Boolean,
+        default: false,
+        required:true
+    },
 });
+
+userSchema.methods.getJWTToken = function () {
+    return jwt.sign({ id: this._id, number:this.phoneNumber }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRE,
+    });
+  };
+
 
 module.exports = mongoose.model('User', userSchema);
