@@ -37,17 +37,50 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-    const {email} = req.body;
+    const {email, phoneNumber} = req.body;
     //Finding user in database
     const user = await User.findOne({email});
     if (!user) {
         return next(new ErrorHandler("Invalid Email", 401));
     }
+    const OTP = otpGenerator.generate(6, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+    });
+    console.log(OTP);
+    const otpData = await Otp.create({userId: user._id, otp: OTP});
+    const salt = await bcrypt.genSalt(10);
+    otpData.otp = await bcrypt.hash(otpData.otp, salt);
+    const result = await otpData.save();
     return res.status(200).json({
         success: true,
-        data: user,
+        message: "Otp send successfully"
     });
 };
+
+exports.loginOtp = async (req, res, next) => {
+    const {userId, otp} = req.body;
+    const student = await User.findOne({_id: userId});
+    if (!student) {
+        return res.status(401).json({err:"The user does not exist"});
+    }
+    const otpData = await Otp.findOne({userId: student._id});
+    const isMatch = await bcrypt.compare(otp, otpData.otp);
+    if (!isMatch) {
+        return res.status(401).json({err:"Invalid Otp"});
+    }
+    await Otp.findByIdAndDelete(otpData._id);
+    const userToken = student.getJWTToken();
+    res.status(200).json({
+        success:true,
+        token:userToken
+    });
+};
+
+
+
 
 exports.logoutUser = async (res, req, next) => {
     res.cookie("token", null, {

@@ -2,7 +2,7 @@ const Document = require("../models/documentModel");
 
 const ErrorHandler = require("../utils/errorHandler");
 
-exports.createDocument = async (req, res, next) => {
+async function createDocument(req, res, next)  {
     try {
         const curUser = req.user;
         const {content, title} = req.body;
@@ -13,6 +13,22 @@ exports.createDocument = async (req, res, next) => {
 
         return res.status(200).json(document);
     } catch (e) {
-        return next(new ErrorHandler("Something went wrong", 500));
+        console.log(e);
+        return res.status(500).json({message: "Something went wrong"});
     }
 };
+
+
+async function getDocuments(req, res, next) {
+    try {
+        const curUser = req.user;
+        const documents = await Document.find({ownerId: curUser._id});
+
+        return res.status(200).json(documents);
+    } catch (e) {
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}
+
+
+module.exports = {createDocument, getDocuments};
