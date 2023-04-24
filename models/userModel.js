@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     },
 });
 
+console.log("hello", process.env.JWT_EXPIRE)
 userSchema.methods.getJWTToken = function () {
     console.log(this._id);
     console.log("hello");
