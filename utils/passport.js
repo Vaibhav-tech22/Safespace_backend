@@ -5,22 +5,25 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 let opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.PASSPORT_SECRET;
-console.log(opts);
-const autheticated = passport.use(
+
+const authenticated = passport.use(
     "student",
-    new JwtStrategy(opts, async function (jwt_payload, done) {
-        const user = await Student.findOne({
+    new JwtStrategy({
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: process.env.PASSPORT_SECRET,
+    }, async function (jwt_payload, done) {
+        console.log(jwt_payload);
+        const user = await Student.findById({
             _id: jwt_payload.identifier,
             verified: true,
         });
-        // done(error, doesTheUserExist)
+
         if (user) {
             return done(null, user);
         } else {
             return done(null, false);
-            // or you could create a new account
         }
     })
 );
 
-moduleexports = autheticated;
+moduleexports = authenticated;
