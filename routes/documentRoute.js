@@ -1,9 +1,9 @@
 const express = require("express");
 const {createDocument, getDocuments} = require("../controllers/documentController");
-const passport = require("passport");
+const {authenticated} = require("../utils/passport");
 const router = express.Router();
 
 //creating the document with student authenticated
-router.route("/create").post(passport.authenticate("student", {session: false}), createDocument);
-router.route("/get").get(passport.authenticate("student", {session: false}), getDocuments);
+router.route("/create").post(authenticated, createDocument);
+router.route("/get").get(authenticated, getDocuments);
 module.exports = router;

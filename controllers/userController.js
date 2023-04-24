@@ -73,8 +73,15 @@ exports.loginOtp = async (req, res, next) => {
     }
     await Otp.findByIdAndDelete(otpData._id);
     const userToken = student.getJWTToken();
-    res.status(200).json({
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+    res.status(200).cookie('token', userToken, options).json({
         success:true,
+        user:student,
         token:userToken
     });
 };
@@ -107,10 +114,16 @@ exports.verifyOtp = async (req, res, next) => {
     user.verified = true;
     await user.save();
     await Otp.findByIdAndDelete(otpData._id);
-    const token = user.getJWTToken();
-    res.status(200).json({
+    const userToken = user.getJWTToken();
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+    res.status(200).cookie('token', userToken, options).json({
         success: true,
-        token,
+        userToken,
         user,
     });
 };
