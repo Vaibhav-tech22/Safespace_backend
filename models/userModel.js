@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     },
 });
 
+console.log("hello", process.env.JWT_EXPIRE)
 userSchema.methods.getJWTToken = function () {
     return jwt.sign({ id: this._id, number:this.phoneNumber }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE,

@@ -9,6 +9,10 @@ const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
+let opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = process.env.JWT_SECRET;
+
 
 passport.use(
     "student",
@@ -16,8 +20,10 @@ passport.use(
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.JWT_SECRET,
     }, async function (jwt_payload, done) {
+        console.log(jwt_payload);
         const user = await Student.findById({
-            _id: jwt_payload.identifier,
+            _id: jwt_payload.id,
+            verified: true,
         });
         console.log(user);
 
@@ -29,15 +35,15 @@ passport.use(
     })
 );
 
-passport.serializeUser(function (user, done) {
-    done(null, user.id);
-});
+// passport.serializeUser(function (user, done) {
+//     done(null, user.id);
+// });
 
-passport.deserializeUser(function (id, done) {
-    Student.findById(id, function (err, user) {
-        done(err, user);
-    });
-});
+// passport.deserializeUser(function (id, done) {
+//     Student.findById(id, function (err, user) {
+//         done(err, user);
+//     });
+// });
 
 app.use(express.json());
 app.use("/api/v1/auth", userRoute);
