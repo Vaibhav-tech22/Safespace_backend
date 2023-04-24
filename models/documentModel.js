@@ -11,11 +11,11 @@ const documentSchema = new mongoose.Schema({
         required: [true, "Please enter document name"],
         trim: true,
     },
-    content:{
+    content: {
         type: String,
-        required: [true, "Please enter document content"],
-        trim: true
-    }
+        trim: true,
+        default: "",
+    },
 });
 
 module.exports = mongoose.model("Document", documentSchema);

@@ -2,6 +2,7 @@ const express = require("express");
 const userRoute = require("./routes/userRoute");
 const documentRoute = require("./routes/documentRoute");
 const app = express();
+const morgan = require("morgan");
 const Student = require("./models/userModel");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -47,6 +48,7 @@ passport.use(
 //     });
 // });
 app.use(cors());
+app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/v1/auth", userRoute);
 app.use("/api/v1/document", documentRoute);
