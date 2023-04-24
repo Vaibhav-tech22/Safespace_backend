@@ -4,8 +4,6 @@ const connectDataBase = require("./config/dataBase.js");
 //Handling uncaught exception
 process.on("uncaughtException", (err) => {
     console.log(`Error: , ${err.message}`);
-    console.log(`Shutting down server due to unhandled promise rejection`);
-    process.exit(1);
 });
 
 //config file

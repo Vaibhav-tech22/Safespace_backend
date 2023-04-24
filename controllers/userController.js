@@ -7,6 +7,7 @@ const User = require("../models/userModel");
 const Otp = require("../models/otpModel");
 
 const ErrorHandler = require("../utils/errorHandler");
+const {default: mongoose} = require("mongoose");
 
 exports.registerUser = async (req, res, next) => {
     const {name, email, phoneNumber} = req.body;
@@ -56,7 +57,7 @@ exports.loginUser = async (req, res, next) => {
     const result = await otpData.save();
     return res.status(200).json({
         success: true,
-        message: "Otp send successfully"
+        message: "Otp send successfully",
     });
 };
 
@@ -64,24 +65,21 @@ exports.loginOtp = async (req, res, next) => {
     const {userId, otp} = req.body;
     const student = await User.findOne({_id: userId});
     if (!student) {
-        return res.status(401).json({err:"The user does not exist"});
+        return res.status(401).json({err: "The user does not exist"});
     }
     const otpData = await Otp.findOne({userId: student._id});
     const isMatch = await bcrypt.compare(otp, otpData.otp);
     if (!isMatch) {
-        return res.status(401).json({err:"Invalid Otp"});
+        return res.status(401).json({err: "Invalid Otp"});
     }
     await Otp.findByIdAndDelete(otpData._id);
     const userToken = student.getJWTToken();
     res.status(200).json({
-        success:true,
-        user:student,
-        token:userToken
+        success: true,
+        user: student,
+        token: userToken,
     });
 };
-
-
-
 
 exports.logoutUser = async (res, req, next) => {
     res.cookie("token", null, {
@@ -100,7 +98,9 @@ exports.verifyOtp = async (req, res, next) => {
     if (!user) {
         return next(new ErrorHandler("Invalid user", 401));
     }
-    const otpData = await Otp.findOne({userId: userId});
+    const otpData = await Otp.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+    });
     const isMatch = await bcrypt.compare(otp, otpData.otp);
     if (!isMatch) {
         return next(new ErrorHandler("Invalid Otp", 401));
