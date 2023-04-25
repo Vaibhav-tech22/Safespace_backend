@@ -1,5 +1,7 @@
 const {default: mongoose} = require("mongoose");
 const Document = require("../models/documentModel");
+const User = require("../models/userModel");
+const SharedKey = require("../models/sharedKey");
 
 const ErrorHandler = require("../utils/errorHandler");
 
@@ -68,5 +70,38 @@ exports.getSingleDocument = async (req, res, next) => {
         return res.status(200).json(document);
     } catch (e) {
         return res.status(500).json({message: "Something went aasdfasdfasdfs"});
+    }
+};
+
+exports.addCollaborator = async (req, res) => {
+    try {
+        const curUser = req.user;
+        const {documentId, collaboratorEmail} = req.body;
+
+        const document = await Document.findOne({
+            ownerId: new mongoose.Types.ObjectId(curUser._id),
+            _id: new mongoose.Types.ObjectId(documentId),
+        });
+
+        if (!document) {
+            return res.status(304).json({message: "Document not found"});
+        }
+
+        const collaborator = await User.findOne({email: collaboratorEmail});
+        if (!collaborator) {
+            return res
+                .status(304)
+                .json({message: "Invalid collaborator email"});
+        }
+
+        if (document.collaborators.includes(collaborator._id)) {
+            return res
+                .status(302)
+                .json({message: "Collaborator already added"});
+        }
+
+        document.collaborators.push(collaborator._id);
+    } catch (e) {
+        return res.status(500).json({message: "Something went wrong"});
     }
 };

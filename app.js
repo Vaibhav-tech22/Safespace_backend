@@ -1,6 +1,7 @@
 const express = require("express");
 const userRoute = require("./routes/userRoute");
 const documentRoute = require("./routes/documentRoute");
+const sharedKeyRoutes = require("./routes/sharedKeyRoutes");
 const app = express();
 const morgan = require("morgan");
 const Student = require("./models/userModel");
@@ -52,5 +53,6 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/v1/auth", userRoute);
 app.use("/api/v1/document", documentRoute);
+app.use("/api/v1/sharedKey", sharedKeyRoutes);
 
 module.exports = app;
