@@ -51,3 +51,25 @@ exports.completeSharedKeyPair = async (req, res) => {
         return res.status(500).json({message: "Something went wrong"});
     }
 };
+
+exports.getPendingSharedKeys = async (req, res) => {
+    try {
+        const curUser = req.user;
+        const pendingKeyObjects = await SharedKey.find({
+            userTwo: curUser._id,
+            complete: false,
+        }).populate("userOne");
+
+        const pendingKeyObjectsResponse = pendingKeyObjects.map((item) => {
+            return {
+                email: item.userOne.email,
+                commonEncryptedKey: item.commonEncryptedKey,
+            };
+        });
+
+        return res.status(200).json({pendingKeyObjectsResponse});
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+};

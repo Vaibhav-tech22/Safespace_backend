@@ -71,11 +71,11 @@ exports.loginUser = async (req, res, next) => {
 };
 
 exports.loginOtp = async (req, res, next) => {
-    try{
+    try {
         const {userId, otp} = req.body;
         const student = await User.findOne({_id: userId});
         if (!student) {
-        return res.status(401).json({err: "The user does not exist"});
+            return res.status(401).json({err: "The user does not exist"});
         }
         const otpData = await Otp.findOne({userId: student._id});
         const isMatch = await bcrypt.compare(otp, otpData.otp);
@@ -89,7 +89,7 @@ exports.loginOtp = async (req, res, next) => {
             user: student,
             token: userToken,
         });
-    }catch(error){
+    } catch (error) {
         return next(new ErrorHandler(error.message, 500));
     }
 };
@@ -106,7 +106,7 @@ exports.logoutUser = async (res, req, next) => {
 };
 
 exports.verifyOtp = async (req, res, next) => {
-    try{
+    try {
         const {userId, otp} = req.body;
         const user = await User.findOne({_id: userId, verified: false});
         if (!user) {
@@ -128,7 +128,7 @@ exports.verifyOtp = async (req, res, next) => {
             userToken,
             user,
         });
-    }catch(error){
+    } catch (error) {
         return next(new ErrorHandler(error.message, 500));
     }
 };
