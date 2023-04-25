@@ -73,3 +73,28 @@ exports.getPendingSharedKeys = async (req, res) => {
         return res.status(500).json({message: "Something went wrong"});
     }
 };
+
+exports.getCompleteSharedKeys = async (req, res) => {
+    try {
+        const curUser = req.user;
+        const pendingKeyObjects = await SharedKey.find({
+            $or: [{userTwo: curUser._id}, {userOne: curUser._id}],
+            complete: true,
+        })
+            .populate("userOne")
+            .populate("userTwo");
+
+        const pendingKeyObjectsResponse = pendingKeyObjects.map((item) => {
+            return {
+                email: item.userOne._id.equals(curUser._id)
+                    ? item.userTwo.email
+                    : item.userOne.email,
+            };
+        });
+
+        return res.status(200).json({pendingKeyObjectsResponse});
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({message: "Something went wrong"});
+    }
+};

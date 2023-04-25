@@ -3,6 +3,7 @@ const {
     createSharedKeyPair,
     completeSharedKeyPair,
     getPendingSharedKeys,
+    getCompleteSharedKeys,
 } = require("../controllers/sharedKeyControllers.js");
 const passport = require("passport");
 require("../app");
@@ -27,6 +28,13 @@ router
     .get(
         passport.authenticate("student", {session: false}),
         getPendingSharedKeys
+    );
+
+router
+    .route("/get/complete")
+    .get(
+        passport.authenticate("student", {session: false}),
+        getCompleteSharedKeys
     );
 
 module.exports = router;
