@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const documentSchema = new mongoose.Schema({
     ownerId: {
         type: mongoose.Schema.ObjectId,
-        ref: "Student",
+        ref: "User",
         required: [true, "Please enter owner id"],
     },
     title: {

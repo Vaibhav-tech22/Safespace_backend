@@ -4,6 +4,7 @@ const {
     getDocuments,
     saveDocument,
     getSingleDocument,
+    addCollaborator,
 } = require("../controllers/documentController");
 const {authenticated} = require("../utils/passport");
 const passport = require("passport");
@@ -28,5 +29,9 @@ router
 router
     .route("/get")
     .get(passport.authenticate("student", {session: false}), getSingleDocument);
+
+router
+    .route("/collaborator/add")
+    .post(passport.authenticate("student", {session: false}), addCollaborator);
 
 module.exports = router;
