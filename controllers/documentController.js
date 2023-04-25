@@ -8,7 +8,7 @@ exports.createDocument = async (req, res, next) => {
         const curUser = req.user;
         const {content, title} = req.body;
 
-        const documentBody = {content, title, ownerId: curUser._id};
+        const documentBody = {content, title, ownerId: curUser._id, lastEditedAt: Date.now().toString()};
 
         const document = await Document.create(documentBody);
 
@@ -31,10 +31,9 @@ exports.saveDocument = async (req, res, next) => {
         if (!document) {
             return res.status(304).json({err: "Document not found"});
         }
-
         document.content = content;
+        document.lastEditedAt = Date.now().toString();
         await document.save();
-
         return res.status(200).json({success: true});
     } catch (e) {
         console.log(e);
@@ -64,7 +63,6 @@ exports.getSingleDocument = async (req, res, next) => {
         if (!document) {
             return res.status(304).json({err: "Something went aaaa"});
         }
-
         return res.status(200).json(document);
     } catch (e) {
         return res.status(500).json({message: "Something went aasdfasdfasdfs"});

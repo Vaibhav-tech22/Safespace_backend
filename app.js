@@ -5,7 +5,6 @@ const app = express();
 const morgan = require("morgan");
 const Student = require("./models/userModel");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;

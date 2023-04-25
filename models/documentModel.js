@@ -16,6 +16,10 @@ const documentSchema = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    lastEditedAt:{
+        type: String,
+        default: Date.now().toString(),
+    }
 });
 
 module.exports = mongoose.model("Document", documentSchema);
