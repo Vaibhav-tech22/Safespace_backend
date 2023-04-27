@@ -34,11 +34,7 @@ exports.registerUser = async (req, res, next) => {
         otpData.otp = await bcrypt.hash(otpData.otp, salt);
         const result = await otpData.save();
         const message = `Your OTP for Signup is ${OTP}`;
-        await sendEmail({
-            email: newUser.email,
-            subject: "OTP for Signup",
-            message,
-        })
+        await sendEmail(newUser.email, OTP);
         res.status(200).json({
             success: true,
             success: "Otp send successfully",
@@ -69,11 +65,7 @@ exports.loginUser = async (req, res, next) => {
         otpData.otp = await bcrypt.hash(otpData.otp, salt);
         const result = await otpData.save();
         const message = `Your OTP for Login is ${OTP}`;
-        await sendEmail({
-            email: user.email,
-            subject: "OTP for login",
-            message,
-        })
+        await sendEmail(user.email, OTP);
         res.status(200).json({
             success: true,
             success: "Otp send successfully",

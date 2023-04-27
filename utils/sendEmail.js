@@ -1,19 +1,28 @@
-const nodemailer = require('nodemailer');
-const sendEmail = async (options) => {
-    const transporter = nodemailer.createTransport({
-        service: process.env.SMTP_SERVICE,
-        secure:false,
-        auth:{
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD
-        }
-    });
-    const mailOptions = {
-        from: process.env.SMTP_FROM,
-        to: options.to,
-        subject: options.subject,
-        text: options.message
-    };
-    await transporter.sendMail(mailOptions);
+const nodemailer = require("nodemailer");
+
+const sendEmail = async (to, otp) => {
+    console.log(process.env);
+    try {
+        let transporter = nodemailer.createTransport({
+            host: "smtp-relay.sendinblue.com",
+            port: 587,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+        let info = await transporter.sendMail({
+            from: "agrimchopra90@gmail.com",
+            to: to,
+            subject: "Your SafeSpace OTP",
+            text: "Your secret OTP is " + otp,
+        });
+        console.log(`Message sent: ${info.messageId}`);
+        return `Message sent: ${info.messageId}`;
+    } catch (error) {
+        console.error(error);
+        return;
+    }
 };
+
 module.exports = sendEmail;
