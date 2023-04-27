@@ -6,7 +6,6 @@ const {
     getSingleDocument,
     addCollaborator,
 } = require("../controllers/documentController");
-const {authenticated} = require("../utils/passport");
 const passport = require("passport");
 require("../app");
 const router = express.Router();

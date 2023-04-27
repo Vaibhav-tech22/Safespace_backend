@@ -11,9 +11,8 @@ const documentCollaboratorSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    sharedDocumentId: {
-        type: mongoose.Schema.ObjectId,
-        ref: "Document",
+    sharedDocument: {
+        type: String,
         required: true,
     },
 });
