@@ -5,6 +5,7 @@ const {
     saveDocument,
     getSingleDocument,
     addCollaborator,
+    getSharedDocuments,
 } = require("../controllers/documentController");
 const passport = require("passport");
 require("../app");
@@ -24,6 +25,13 @@ router.post(
 router
     .route("/get/all")
     .get(passport.authenticate("student", {session: false}), getDocuments);
+
+router
+    .route("/get/shared")
+    .get(
+        passport.authenticate("student", {session: false}),
+        getSharedDocuments
+    );
 
 router
     .route("/get")

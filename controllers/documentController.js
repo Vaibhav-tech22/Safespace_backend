@@ -167,7 +167,6 @@ exports.getSharedDocuments = async (req, res) => {
     try {
         const curUser = req.user;
         const documents = await Document.find({
-            _id: docId,
             collaborators: {$elemMatch: {id: curUser._id}},
         });
         return res.status(200).json(documents);

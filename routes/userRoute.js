@@ -6,6 +6,7 @@ const {
     verifyOtp,
     loginOtp,
     addFavourites,
+    getFavourites,
 } = require("../controllers/userController");
 const router = express.Router();
 
@@ -16,4 +17,7 @@ router.route("/login/verify").post(loginOtp);
 router
     .route("/favorite/toggle")
     .post(passport.authenticate("student", {session: false}), addFavourites);
+router
+    .route("/documents/get/favorites")
+    .get(passport.authenticate("student", {session: false}), getFavourites);
 module.exports = router;

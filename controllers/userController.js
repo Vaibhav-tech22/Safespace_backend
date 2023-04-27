@@ -160,12 +160,12 @@ exports.addFavourites = async (req, res, next) => {
 
 exports.getFavourites = async (req, res, next) => {
     try {
-        const curUser = req.user.populate("favourites");
-        const favourites = curUser.favourites;
-        res.status(200).json({
-            success: true,
-            favourites,
-        });
+        const curUser = req.user;
+        const user = await User.findOne({_id: curUser._id}).populate(
+            "favourites"
+        );
+        const favourites = user.favourites;
+        res.status(200).json(favourites);
     } catch (error) {
         return next(new ErrorHandler(error.message, 500));
     }
