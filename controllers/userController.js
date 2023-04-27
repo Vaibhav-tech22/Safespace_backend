@@ -8,6 +8,7 @@ const Otp = require("../models/otpModel");
 
 const ErrorHandler = require("../utils/errorHandler");
 const {default: mongoose} = require("mongoose");
+const sendEmail = require("../utils/sendEmail");
 
 exports.registerUser = async (req, res, next) => {
     try {
@@ -32,7 +33,14 @@ exports.registerUser = async (req, res, next) => {
         const salt = await bcrypt.genSalt(10);
         otpData.otp = await bcrypt.hash(otpData.otp, salt);
         const result = await otpData.save();
-        res.status(201).json({
+        const message = `Your OTP for Signup is ${OTP}`;
+        await sendEmail({
+            email: newUser.email,
+            subject: "OTP for Signup",
+            message,
+        })
+        res.status(200).json({
+            success: true,
             success: "Otp send successfully",
             newUser,
         });
@@ -60,10 +68,16 @@ exports.loginUser = async (req, res, next) => {
         const salt = await bcrypt.genSalt(10);
         otpData.otp = await bcrypt.hash(otpData.otp, salt);
         const result = await otpData.save();
-        return res.status(200).json({
+        const message = `Your OTP for Login is ${OTP}`;
+        await sendEmail({
+            email: user.email,
+            subject: "OTP for login",
+            message,
+        })
+        res.status(200).json({
             success: true,
-            user: user,
-            message: "Otp send successfully",
+            success: "Otp send successfully",
+            user,
         });
     } catch (error) {
         return next(new ErrorHandler(error.message, 500));
