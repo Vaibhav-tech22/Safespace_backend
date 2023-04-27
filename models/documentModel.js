@@ -19,7 +19,19 @@ const documentSchema = new mongoose.Schema({
     lastEditedAt:{
         type: String,
         default: Date.now().toString(),
-    }
+    },
+    collaborators:[{
+        id:{
+
+            type: mongoose.Schema.ObjectId,
+            ref: "User",
+        },
+        role:{
+            type:String, 
+            enum:["editor", "viewer"],
+            default:"viewer",
+        } 
+    }]
 });
 
 module.exports = mongoose.model("Document", documentSchema);

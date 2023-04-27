@@ -28,10 +28,15 @@ exports.saveDocument = async (req, res, next) => {
 
         const document = await Document.findOne({
             _id: docId,
-            ownerId: curUser._id,
+            $OR: [{ownerId: curUser._id}, {collaborators: {$elemMatch: {id: curUser._id}}}],
         });
         if (!document) {
             return res.status(304).json({err: "Document not found"});
+        }
+        if (curUser._id in document.collaborators) {
+            if (document.collaborators[curUser._id].role === "viewer") {
+                return res.status(304).json({err: "You don't have permission to edit this document"});
+            }
         }
         document.content = content;
         document.lastEditedAt = Date.now().toString();
@@ -46,8 +51,10 @@ exports.saveDocument = async (req, res, next) => {
 exports.getDocuments = async (req, res, next) => {
     try {
         const curUser = req.user;
-        const documents = await Document.find({ownerId: curUser._id});
-
+        const documents = await Document.find({
+            _id: docId,
+            $OR: [{ownerId: curUser._id}, {collaborators: {$elemMatch: {id: curUser._id}}}],
+        });
         return res.status(200).json(documents);
     } catch (e) {
         return res.status(500).json({message: "Something went wrong"});
@@ -59,7 +66,7 @@ exports.getSingleDocument = async (req, res, next) => {
         const curUser = req.user;
         const {docId} = req.query;
         const document = await Document.findOne({
-            ownerId: new mongoose.Types.ObjectId(curUser._id),
+            $OR: [{ownerId: curUser._id}, {collaborators: {$elemMatch: {id: curUser._id}}}],
             _id: new mongoose.Types.ObjectId(docId),
         });
         if (!document) {
@@ -74,15 +81,20 @@ exports.getSingleDocument = async (req, res, next) => {
 exports.addCollaborator = async (req, res) => {
     try {
         const curUser = req.user;
-        const {documentId, collaboratorEmail} = req.body;
+        const {documentId, collaboratorEmail, role} = req.body;
 
         const document = await Document.findOne({
-            ownerId: new mongoose.Types.ObjectId(curUser._id),
+            $OR: [{ownerId: curUser._id}, {collaborators: {$elemMatch: {id: curUser._id}}}],
             _id: new mongoose.Types.ObjectId(documentId),
         });
 
         if (!document) {
             return res.status(304).json({message: "Document not found"});
+        }
+        if (curUser._id in document.collaborators) {
+            if (document.collaborators[curUser._id].role === "viewer") {
+                return res.status(304).json({message: "You don't have permission add collaborator"});
+            }
         }
 
         const collaborator = await User.findOne({email: collaboratorEmail});
@@ -97,8 +109,7 @@ exports.addCollaborator = async (req, res) => {
                 .status(302)
                 .json({message: "Collaborator already added"});
         }
-
-        document.collaborators.push(collaborator._id);
+        document.collaborators.push({id:collaborator._id, role:role});
     } catch (e) {
         return res.status(500).json({message: "Something went wrong"});
     }
