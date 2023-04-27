@@ -14,7 +14,7 @@ exports.createDocument = async (req, res, next) => {
             content,
             title,
             ownerId: curUser._id,
-            lastEditedAt: Date.now().toString(),
+            lastEditedAt: new Date().toString(),
         };
 
         const document = await Document.create(documentBody);
@@ -49,7 +49,7 @@ exports.saveDocument = async (req, res, next) => {
             }
         }
         document.content = content;
-        document.lastEditedAt = Date.now().toString();
+        document.lastEditedAt = new Date().toString();
         await document.save();
         return res.status(200).json({success: true});
     } catch (e) {
