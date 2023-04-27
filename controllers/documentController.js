@@ -114,3 +114,30 @@ exports.addCollaborator = async (req, res) => {
         return res.status(500).json({message: "Something went wrong"});
     }
 };
+
+
+exports.getSharedDocuments = async (req, res) =>{
+        try {
+            const curUser = req.user;
+            const documents = await Document.find({
+                _id: docId,
+                collaborators: {$elemMatch: {id: curUser._id}}
+            });
+            return res.status(200).json(documents);
+        } catch (e) {
+            return res.status(500).json({message: "Something went wrong"});
+        }
+}
+
+exports.getMyDocuments = async (req, res) =>{
+    try {
+        const curUser = req.user;
+        const documents = await Document.find({
+            _id: docId,
+            ownerId: curUser._id
+        });
+        return res.status(200).json(documents);
+    } catch (error) {
+        return res.status(500).json({message: "Something went wrong"});
+    }
+}

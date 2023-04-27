@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
         default: false,
         required: true,
     },
+    favourites: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "Document",
+        },
+    ],
 });
 
 userSchema.methods.getJWTToken = function () {

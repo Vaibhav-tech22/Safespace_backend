@@ -132,3 +132,35 @@ exports.verifyOtp = async (req, res, next) => {
         return next(new ErrorHandler(error.message, 500));
     }
 };
+
+exports.addFavourites = async (req, res, next) => {
+    try {
+        const curUser = req.user;
+        const {documentId} = req.body;
+        if (!documentId) {
+            return next(new ErrorHandler("Invalid document id", 400));
+        }
+        curUser.favourites.push(documentId);
+        await curUser.save();
+        res.status(200).json({
+            success: true,
+            message: "Added to favourites",
+        });
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+};
+
+
+exports.getFavourites = async (req, res, next) => {
+    try {
+        const curUser = req.user;
+        const favourites = curUser.favourites;
+        res.status(200).json({
+            success: true,
+            favourites,
+        });
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+};
