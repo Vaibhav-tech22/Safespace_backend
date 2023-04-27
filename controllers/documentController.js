@@ -187,3 +187,54 @@ exports.getMyDocuments = async (req, res) => {
         return res.status(500).json({message: "Something went wrong"});
     }
 };
+
+exports.getCollaborators = async (req, res) => {
+    try {
+        const {docId} = req.query;
+        const document = await Document.findOne({
+            _id: new mongoose.Types.ObjectId(docId),
+        }).populate("collaborators.id");
+
+        if (!document) {
+            return res.status(304).json({err: "Invalid document id"});
+        }
+
+        collaborators = document.collaborators;
+        return res.status(200).json(collaborators);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({err: "Something went wrong"});
+    }
+};
+
+exports.removeCollaborator = async (req, res) => {
+    try {
+        const curUser = req.user;
+        const {documentId, collaboratorId} = req.body;
+
+        const document = await Document.findOne({
+            ownerId: curUser._id,
+            _id: new mongoose.Types.ObjectId(documentId),
+        });
+
+        if (!document) {
+            return res.status(304).json({message: "Document not found"});
+        }
+
+        const collaborator = await User.findOne({
+            _id: new mongoose.Types.ObjectId(collaboratorId),
+        });
+        if (!collaborator) {
+            return res.status(304).json({message: "Invalid collaborator id"});
+        }
+
+        let collaborators = document.collaborators.filter((item) => {
+            return !item.id.equals(new mongoose.Types.ObjectId(collaboratorId));
+        });
+        document.collaborators = collaborators;
+        await document.save();
+        return res.status(200).json({success: true});
+    } catch (e) {
+        return res.status(500).json({message: "Something went wrong"});
+    }
+};

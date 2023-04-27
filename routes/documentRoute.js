@@ -5,7 +5,9 @@ const {
     saveDocument,
     getSingleDocument,
     addCollaborator,
+    removeCollaborator,
     getSharedDocuments,
+    getCollaborators,
 } = require("../controllers/documentController");
 const passport = require("passport");
 require("../app");
@@ -40,5 +42,16 @@ router
 router
     .route("/collaborator/add")
     .post(passport.authenticate("student", {session: false}), addCollaborator);
+
+router
+    .route("/collaborators/get")
+    .get(passport.authenticate("student", {session: false}), getCollaborators);
+
+router
+    .route("/collaborator/remove")
+    .post(
+        passport.authenticate("student", {session: false}),
+        removeCollaborator
+    );
 
 module.exports = router;
