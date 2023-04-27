@@ -67,7 +67,17 @@ exports.getDocuments = async (req, res, next) => {
                 {collaborators: {$elemMatch: {id: curUser._id}}},
             ],
         });
-        return res.status(200).json(documents);
+
+        const addedInfoDocs = documents.map((item) => {
+            const id = item._id;
+            let isFav = false;
+            if (curUser.favourites.includes(id)) {
+                isFav = true;
+            }
+            return {...item._doc, isFav};
+        });
+
+        return res.status(200).json(addedInfoDocs);
     } catch (e) {
         console.log(e);
         return res.status(500).json({message: "Something went wrong"});
@@ -98,7 +108,10 @@ exports.getSingleDocument = async (req, res, next) => {
             collaboratorEntry.role === "editor"
                 ? true
                 : false;
-        return res.status(200).json({...document._doc, editAccess});
+
+        const isFav = curUser.favourites.includes(document._id) ? true : false;
+
+        return res.status(200).json({...document._doc, editAccess, isFav});
     } catch (e) {
         console.log(e);
         return res.status(500).json({message: "Something went aasdfasdfasdfs"});
@@ -150,29 +163,28 @@ exports.addCollaborator = async (req, res) => {
     }
 };
 
-
-exports.getSharedDocuments = async (req, res) =>{
-        try {
-            const curUser = req.user;
-            const documents = await Document.find({
-                _id: docId,
-                collaborators: {$elemMatch: {id: curUser._id}}
-            });
-            return res.status(200).json(documents);
-        } catch (e) {
-            return res.status(500).json({message: "Something went wrong"});
-        }
-}
-
-exports.getMyDocuments = async (req, res) =>{
+exports.getSharedDocuments = async (req, res) => {
     try {
         const curUser = req.user;
         const documents = await Document.find({
             _id: docId,
-            ownerId: curUser._id
+            collaborators: {$elemMatch: {id: curUser._id}},
+        });
+        return res.status(200).json(documents);
+    } catch (e) {
+        return res.status(500).json({message: "Something went wrong"});
+    }
+};
+
+exports.getMyDocuments = async (req, res) => {
+    try {
+        const curUser = req.user;
+        const documents = await Document.find({
+            _id: docId,
+            ownerId: curUser._id,
         });
         return res.status(200).json(documents);
     } catch (error) {
         return res.status(500).json({message: "Something went wrong"});
     }
-}
+};

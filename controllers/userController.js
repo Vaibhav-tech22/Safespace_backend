@@ -140,7 +140,14 @@ exports.addFavourites = async (req, res, next) => {
         if (!documentId) {
             return next(new ErrorHandler("Invalid document id", 400));
         }
-        curUser.favourites.push(documentId);
+        if (curUser.favourites.includes(documentId)) {
+            const ar = curUser.favourites.filter((item) => {
+                return item != documentId;
+            });
+            curUser.favourites = ar;
+        } else {
+            curUser.favourites.push(documentId);
+        }
         await curUser.save();
         res.status(200).json({
             success: true,
@@ -151,10 +158,9 @@ exports.addFavourites = async (req, res, next) => {
     }
 };
 
-
 exports.getFavourites = async (req, res, next) => {
     try {
-        const curUser = req.user;
+        const curUser = req.user.populate("favourites");
         const favourites = curUser.favourites;
         res.status(200).json({
             success: true,
